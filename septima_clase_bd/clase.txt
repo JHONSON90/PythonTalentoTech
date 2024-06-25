@@ -1,0 +1,146 @@
+en las bases de datos utilizamos diferentes lenguajes como los siguientes:
+
+DDL: lenguaje de definición de datos o se pueden utilizar para definir el esquema de la base de datos.
+
+DDL = CREATE, DROP, ALTER, TRUNCATE
+CREATE: este comando se utiliza para crear la base de datos o sus
+    objetos (como tabla, índice, función, vistas, procedimiento de
+    almacenamiento y activadores).
+DROP : este comando se utiliza para eliminar objetos de la base de
+    datos.
+ALTER : Se utiliza para alterar la estructura de la base de datos.
+TRUNCATE : Esto se utiliza para eliminar todos los registros de una     tabla,
+    incluidos todos los espacios asignados para los registros.
+COMENTARIO : Se utiliza para agregar comentarios al diccionario de
+    datos.
+RENAME : Esto se utiliza para cambiar el nombre de un objeto existente
+    en la base de datos.
+
+DQL – Lenguaje de consulta de datos
+DQL = SELECT
+SELECT : Se utiliza para recuperar datos de la base de datos.
+
+
+DML – Lenguaje de manipulación de datos
+DML = INSERT, UPDATE, DELETE, CALL, EXPLAINCALL
+
+INSERT : Se utiliza para insertar datos en una tabla.
+UPDATE : Se utiliza para actualizar datos existentes dentro de una      tabla.
+DELETE : Se utiliza para eliminar registros de una tabla de base de datos.
+LOCK : Concurrencia de control de tablas.
+
+
+
+DCL – Lenguaje de control de datos
+TCL – Lenguaje de control de transacciones
+
+
+TCL = COMMIT, SAVEPOINT, ROLLBACK, SETTransaction, SETConstrain
+DCL = GRANT, REVOKE
+
+#creamos una base de datos
+CREATE database datosEjemplo;
+use datosEjemplo; #la usamos
+
+#crea una base de datos de estudiantes
+
+create table estudiantes(
+    idEstudiantes int primary key auto_increment,
+    nombre varchar(50),
+    apellido varchar(50)
+)
+
+#crea la tabla de cursos
+create table cursos(
+    idCursos int primary key auto_increment,
+    nombre varchar(100),
+)
+
+# vamos a crear la tabla relacional
+
+create table incripciones(
+    idEstudiantes
+    idCursos 
+    foreing key (idEstudiantes) reference estudiantes(idEstudiantes),
+    foreing key (idCursos) reference cursos(idCursos),
+    primary key (idEstudiantes, idCursos)
+    );
+
+
+#crearemos estudiantes
+
+insert into estudiantes(nombre, apellido)
+values ("Jhon Edison", "Portilla Luna"),
+        ("Juan", "apraez"),
+        ("Roberto", "Pelaez"),
+        ("Carlos", "zuñiga"),
+        ("Alejandro", "Portilla"),
+
+
+insert into cursos(nombre)
+values ("matematicas"),
+        ("Javascript"),
+        ("Python"),
+        ("Educacion fisica"),
+        ("React"),
+
+
+#vamos a llenar la base de inscripciones
+
+insert into inscripciones(idEstudiantes, idCursos)
+
+ejercicio
+
+-- Crear tabla Persona
+CREATE TABLE Persona (
+    id_persona INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    correo_electronico VARCHAR(100) NOT NULL,
+    cargo VARCHAR(50) NOT NULL,
+    cumpleaños DATE
+);
+
+-- Crear tabla Usuario
+CREATE TABLE Usuario (
+    id_usuario INT PRIMARY KEY AUTO_INCREMENT,
+    nombre_usuario VARCHAR(50) NOT NULL,
+    contraseña VARCHAR(100) NOT NULL,
+    id_persona INT NOT NULL,
+    FOREIGN KEY (id_persona) REFERENCES Persona(id_persona)
+);
+
+-- Crear tabla Acontecimiento
+CREATE TABLE Acontecimiento (
+    id_acontecimiento INT PRIMARY KEY AUTO_INCREMENT,
+    descripcion VARCHAR(255) NOT NULL,
+    fecha DATE NOT NULL,
+    id_persona INT NOT NULL,
+    FOREIGN KEY (id_persona) REFERENCES Persona(id_persona)
+);
+
+INSERT INTO Persona (nombre, apellido, correo_electronico, cargo, cumpleaños) VALUES
+    ('Juan', 'Pérez', 'juan.perez@email.com', 'Gerente', '1980-01-01'),
+    ('María', 'Gómez', 'maria.gomez@email.com', 'Analista', '1985-02-02'),
+    ('Pedro', 'López', 'pedro.lopez@email.com', 'Desarrollador', '1990-03-03'),
+    ('Ana', 'Martínez', 'ana.martinez@email.com', 'Diseñadora', '1995-04-04'),
+    ('Carlos', 'Sánchez', 'carlos.sanchez@email.com', 'Tester', '2000-05-05'),
+    ('Laura', 'García', 'laura.garcia@email.com', 'Ventas', '2005-06-06'),
+    ('Diego', 'Rodríguez', 'diego.rodriguez@email.com', 'Marketing', '2010-07-07'),
+    ('Sandra', 'Flores', 'sandra.flores@email.com', 'Recursos Humanos', '2015-08-08'),
+    ('Andrés', 'Ramírez', 'andres.ramirez@email.com', 'Contabilidad', '2020-09-09'),
+    ('Carolina', 'Navarro', 'carolina.navarro@email.com', 'Soporte Técnico', '2025-10-10');
+
+-- Insertar 5 usuarios por persona
+INSERT INTO Usuario (nombre_usuario, contraseña, id_persona) VALUES
+    ('juanperez', 'password1', 1),
+    ('mariagomez', 'password2', 2),
+    ('pedrolopez', 'password3', 3),
+    ('anamartinez', 'password4', 4),
+    ('carlosperez', 'password5', 5),
+    ('lauragarcia', 'password6', 6),
+    ('diegorodriguez', 'password7', 7),
+    ('sandraflores', 'password8', 8),
+    ('andresramirez', 'password9', 9),
+    ('carolinanavarro', 'password10', 10),
+    ('juanperez2', 'password',11)
