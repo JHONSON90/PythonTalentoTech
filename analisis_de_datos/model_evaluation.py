@@ -5,6 +5,10 @@
 #importamos los datos 
 
 from subidadedatos import data
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import PolynomialFeatures
 
 df = data
 
@@ -148,3 +152,208 @@ import seaborn as sns
 
 Title = 'Distribution  Plot of  Predicted Value Using Training Data vs Training Data Distribution'
 DistributionPlot(y_train, yhat_train, "Actual Values (Train)", "Predicted Values (Train)", Title)
+
+# Hasta ahora, el modelo parece estar funcionando bien en el aprendizaje del conjunto de datos de entrenamiento. Pero, ¿qué sucede cuando el modelo encuentra nuevos datos del conjunto de datos de prueba? Cuando el modelo genera nuevos valores a partir de los datos de prueba, vemos que la distribución de los valores predichos es muy diferente de los valores objetivo reales.
+
+Title='Distribution  Plot of  Predicted Value Using Test Data vs Data Distribution of Test Data'
+DistributionPlot(y_test,yhat_test,"Actual Values (Test)","Predicted Values (Test)",Title)
+
+# Al comparar la Figura 1 y la Figura 2, es evidente que la distribución de los datos de prueba en la Figura 1 ajusta mucho mejor los datos. Esta diferencia en la Figura 2 es evidente en el rango de 5.000 a 15.000. Aquí es donde la forma de la distribución es extremadamente diferente. Veamos si la regresión polinómica también muestra una caída en la precisión de la predicción al analizar el conjunto de datos de prueba.
+
+#! Overfitting
+
+# El sobreajuste ocurre cuando el modelo se ajusta al ruido, pero no al proceso subyacente. Por lo tanto, al probar su modelo utilizando el conjunto de prueba, su modelo no funciona tan bien ya que está modelando ruido, no el proceso subyacente que generó la relación. Creemos un modelo polinómico de grado 5.
+
+x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.45, random_state=0)
+
+# Realizaremos una transformación polinómica de grado 5 en la característica 'caballos de fuerza'.
+pr = PolynomialFeatures(degree=5)
+x_train_pr = pr.fit_transform(x_train[['horsepower']])
+x_test_pr = pr.fit_transform(x_test[['horsepower']])
+
+# Ahora crearemos un modelo de regresion lineal de poly y entrenarla
+poly = LinearRegression()
+poly.fit(x_train_pr, y_train)
+ 
+#miremos la prediccion
+yhat = poly.predict(x_test_pr)
+
+# Tomemos los primeros cinco valores predichos y compárelos con los objetivos reales..
+print("Predicted values:", yhat[0:4])
+print("True values:", y_test[0:4].values)
+
+#Usaremos la función "PollyPlot" que definimos al comienzo para mostrar los datos de entrenamiento, los datos de prueba y la función predicha.
+PollyPlot(x_train['horsepower'], x_test['horsepower'], y_train, y_test, poly,pr)
+
+# Figura 3: Un modelo de regresión polinómica donde los puntos rojos representan datos de entrenamiento, los puntos verdes representan datos de prueba y la línea azul representa la predicción del modelo.
+
+# Vemos que la función estimada parece rastrear los datos, pero alrededor de 200 caballos de fuerza, la función comienza a divergir de los puntos de datos.
+
+#R^2 de los datos de entrenamiento:
+poly.score(x_train_pr, y_train) # 0.5567716897754004
+#R^2 de los datos de test:
+poly.score(x_test_pr, y_test) # -29.8709962338727
+
+#Vemos que el R^2 de los datos de entrenamiento es 0,5567, mientras que el R^2 de los datos de prueba fue -29,87. Cuanto menor sea el R^2, peor será el modelo. Un R^2 negativo es un signo de sobreajuste
+
+#Veamos cómo cambia R ^ 2 en los datos de prueba para polinomios de diferentes órdenes y luego tracemos los resultados.
+
+Rsqu_test = []
+
+order = [1, 2, 3, 4]
+for n in order:
+    pr = PolynomialFeatures(degree=n)
+    
+    x_train_pr = pr.fit_transform(x_train[['horsepower']])
+    
+    x_test_pr = pr.fit_transform(x_test[['horsepower']])    
+    
+    lr.fit(x_train_pr, y_train)
+    
+    Rsqu_test.append(lr.score(x_test_pr, y_test))
+
+plt.plot(order, Rsqu_test)
+plt.xlabel('order')
+plt.ylabel('R^2')
+plt.title('R^2 Using Test Data')
+plt.text(3, 0.75, 'Maximum R^2 ')
+
+# Vemos que R^2 aumenta gradualmente hasta que se utiliza un polinomio de orden tres. Luego, R ^ 2 disminuye drásticamente en un polinomio de orden cuatro.
+def f(order, test_data):
+    x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=test_data, random_state=0)
+    pr = PolynomialFeatures(degree=order)
+    x_train_pr = pr.fit_transform(x_train[['horsepower']])
+    x_test_pr = pr.fit_transform(x_test[['horsepower']])
+    poly = LinearRegression()
+    poly.fit(x_train_pr,y_train)
+    PollyPlot(x_train['horsepower'], x_test['horsepower'], y_train,y_test, poly, pr)
+    
+# Podemos realizar transformaciones polinomiales con más de una característica. Creamos un objeto "PolynomialFeatures" "pr1" de grado dos.
+
+pr1 = PolynomialFeatures(degree=2)
+
+# Transformamos las muestras de entrenamiento y prueba para las características "caballos de fuerza", "peso en vacío", "tamaño del motor" y "mpg en carretera". utilizando el método "fit_transform".
+
+x_train_pr1 = pr1.fit_transform(x_train[["horsepower",  'curb-weight', 'engine-size' , 'highway-mpg']])
+x_test_pr1 = pr1.fit_transform(x_test[["horsepower",  'curb-weight', 'engine-size' , 'highway-mpg']])
+
+# utilizando shape mirar cuantas dimensiones tiene la caracteristica
+
+x_train_pr1.shape #imprime(110,15) la respuesta es 15 dimensiones
+
+# Cree un modelo de regresión lineal "poly1". Entrene el objeto usando el método "ajustar" usando las características polinomiales
+
+poly1 = LinearRegression().fit(x_train_pr1, y_train)
+
+# Utilice el método "predict" para predecir una salida en las características polinomiales, luego use la función "DistributionPlot" para mostrar la distribución de la salida de prueba prevista frente a los datos de prueba reales.
+
+yhat_test1=poly1.predict(x_test_pr1) # hacemos la prediccion
+Title='Distribution  Plot of  Predicted Value Using Test Data vs Data Distribution of Test Data' #le da un titulo a la grafica
+DistributionPlot(y_test, yhat_test1, "Actual Values (Test)", "Predicted Values (Test)", Title) #graficamos
+
+# Utilizando el gráfico de distribución anterior, describa (en palabras) las dos regiones donde los precios previstos son menos precisos que el precio real.
+
+#El valor previsto es mayor que el valor real para los automóviles cuyo precio oscila entre $ 10 000; por el contrario, el precio previsto es menor que el precio de costo en el rango de $ 30 000 a $ 40 000. Como tal, el modelo no es tan preciso en estos rangos.
+
+#! RIDE REGRESSION - Regresión de cresta
+
+# En esta sección, revisaremos la regresión de crestas y veremos cómo el parámetro alfa cambia el modelo. Solo una nota, aquí nuestros datos de prueba se utilizarán como datos de validación.
+
+# Realicemos una transformación polinómica de grado dos en nuestros datos.
+
+pr=PolynomialFeatures(degree=2)
+x_train_pr=pr.fit_transform(x_train[['horsepower', 'curb-weight', 'engine-size', 'highway-mpg','normalized-losses','symboling']])
+x_test_pr=pr.fit_transform(x_test[['horsepower', 'curb-weight', 'engine-size', 'highway-mpg','normalized-losses','symboling']])
+
+from sklearn.linear_model import Ridge
+# creamos una regresion de cresta  estableciendo el parametro de regularizacion  (alpha) en 1
+RigeModel=Ridge(alpha=1)
+
+# como en la regresion regular podemos ajustar el modelo utilizando el metodo fit
+RigeModel.fit(x_train_pr, y_train)
+
+# igualmente podemos obtener la prediccion
+yhat = RigeModel.predict(x_test_pr)
+
+# comparemos las primeras cuatro muestras predichas con nuestro conjunto de prueba
+print('predicted:', yhat[0:4])
+print('test set :', y_test[0:4].values)
+
+#Seleccionamos el valor de alfa que minimice el error de prueba. Para hacerlo, podemos usar un bucle for. También hemos creado una barra de progreso para ver cuántas iteraciones hemos completado hasta ahora.
+
+from tqdm import tqdm
+
+Rsqu_test = []
+Rsqu_train = []
+dummy1 = []
+Alpha = 10 * np.array(range(0,1000))
+pbar = tqdm(Alpha)
+
+for alpha in pbar:
+    RigeModel = Ridge(alpha=alpha) 
+    RigeModel.fit(x_train_pr, y_train)
+    test_score, train_score = RigeModel.score(x_test_pr, y_test), RigeModel.score(x_train_pr, y_train)
+    
+    pbar.set_postfix({"Test Score": test_score, "Train Score": train_score})
+
+    Rsqu_test.append(test_score)
+    Rsqu_train.append(train_score)
+
+# 100%|██████████| 1000/1000 [00:05<00:00, 188.83it/s, Test Score=0.564, Train Score=0.859]
+
+# podemos graficar el valor de r^2 para diferentes alphas
+
+width = 12
+height = 10
+plt.figure(figsize=(width, height))
+
+plt.plot(Alpha,Rsqu_test, label='validation data  ')
+plt.plot(Alpha,Rsqu_train, 'r', label='training Data ')
+plt.xlabel('alpha')
+plt.ylabel('R^2')
+plt.legend()
+
+#La línea azul representa el R^2 de los datos de validación y la línea roja representa el R^2 de los datos de entrenamiento. El eje x representa los diferentes valores de Alpha.
+#Aquí el modelo se construye y prueba con los mismos datos, por lo que los datos de entrenamiento y prueba son los mismos.
+#La línea roja en la Figura 4 representa el R^2 de los datos de entrenamiento. A medida que alfa aumenta, R ^ 2 disminuye. Por lo tanto, a medida que aumenta alfa, el modelo se desempeña peor en los datos de entrenamiento.
+#La línea azul representa el R^2 en los datos de validación. A medida que aumenta el valor de alfa, R^2 aumenta y converge en un punto. 
+
+# Realizar regresión de Ridge. Calcule R^2 usando las características polinómicas, use los datos de entrenamiento para entrenar el modelo y use los datos de prueba para probar el modelo. El parámetro alfa debe establecerse en 10.
+
+RigeModel=Ridge(alpha=10)
+RigeModel.fit(x_train_pr, y_train)
+RigeModel.score(x_test_pr, y_test)
+
+# El término alfa es un hiperparámetro. Sklearn tiene la clase GridSearchCV para simplificar el proceso de encontrar el mejor hiperparámetro.
+# Importemos GridSearchCV desde el módulo model_selection.
+from sklearn.model_selection import GridSearchCV
+
+#creamos un diccionario de parametros 
+parameters1 = [{'alpha': [0.001,0.1,1, 10, 100, 1000, 10000, 100000, 100000]}]
+
+#creamos una regresion ridge
+RR=Ridge()
+# Cree un objeto de búsqueda de cuadrícula de crestas: 
+Grid1 = GridSearchCV(RR, parameters1,cv=4)
+
+#Para evitar una advertencia de obsolescencia debido al parámetro iid, configuramos el valor de iid en "Ninguno".
+#Ajustar el modelo:
+
+Grid1.fit(x_data[['horsepower', 'curb-weight', 'engine-size', 'highway-mpg']], y_data)
+
+#El objeto encuentra los mejores valores de parámetros en los datos de validación. Podemos obtener el estimador con mejores parámetros y asignarlo a la variable BestRR de la siguiente manera:
+
+BestRR=Grid1.best_estimator_
+
+# Ahora probamos nuestro modelo con los datos de prueba.
+BestRR.score(x_test[['horsepower', 'curb-weight', 'engine-size', 'highway-mpg']], y_test)
+
+# Realice una búsqueda en cuadrícula para el parámetro alfa y el parámetro de normalización, luego encuentre los mejores valores de los parámetros:
+
+parameters2 = [{'alpha': [0.001, 0.1, 1, 10, 100, 1000, 10000, 100000, 100000]}]
+
+Grid2 = GridSearchCV(Ridge(), parameters2, cv=4)
+Grid2.fit(x_data[['horsepower', 'curb-weight', 'engine-size', 'highway-mpg']], y_data)
+best_alpha = Grid2.best_params_['alpha']
+best_ridge_model = Ridge(alpha=best_alpha)
+best_ridge_model.fit(x_data[['horsepower', 'curb-weight', 'engine-size', 'highway-mpg']], y_data)

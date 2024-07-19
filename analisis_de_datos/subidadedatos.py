@@ -111,6 +111,9 @@ print(data.head())
 # contar por numero de puertas cuantos registros hay
 print(data["num-of-doors"].value_counts())
 
+# sacar valores unicos de una columna
+print(data["num-of-doors"].unique())
+
 # si queremos saber cual es el registro que mas se utiliza en el numero de puertas utilizamos el idxmax
 
 data['num-of-doors'].value_counts().idxmax()

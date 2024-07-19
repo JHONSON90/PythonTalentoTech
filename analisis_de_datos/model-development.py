@@ -12,6 +12,8 @@ pip install'skillsnetwork', 'seaborn'"""
 #! linear regression
 
 from sklearn.linear_model import LinearRegression
+import matplotlib as plt
+import numpy as np
 
 # creamos la linea de regresion
 lm = LinearRegression()
@@ -207,4 +209,4 @@ pipe=Pipeline(Input)
 
 pipe.fit(Z,y)
 ypipe=pipe.predict(Z)
-ypipe[0:10]
+print(ypipe[0:10])
