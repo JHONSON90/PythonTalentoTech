@@ -128,3 +128,14 @@ print(C)
 
 Z =  np.dot(A, B)
 print(Z)
+
+# para mirar las dimensiones 
+print(A.ndim)
+#para mirar el numero de datos hay en el array
+print(A.size)
+
+#accediendo a el primer elemento y primera y segunda columna
+print(A[0,0:2])
+
+#accediendo a los dos primeras filas de la tercera columna
+print(A[0:2,2])
